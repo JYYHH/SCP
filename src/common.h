@@ -37,3 +37,6 @@ extern inline int TCP_accept_with_server_fd(
                         int *sock_p, 
                         struct sockaddr_in *address
                     );
+
+// "dec.c"
+extern inline void *server_handling(void *params);

@@ -4,7 +4,7 @@ int main(int argc, char const* argv[]){
     /*
         1. Initialization
     */
-    char *ip_ = NULL, *port_ = NULL, *file_name = argv[1], *split  =NULL;
+    char *ip_ = NULL, *port_ = NULL, *file_name = argv[1], *split = NULL;
     int is_local = 0, option;
 
     while((option = getopt(argc, argv, "d:l")) > 0){

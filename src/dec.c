@@ -1,5 +1,18 @@
 #include "common.h"
 
+inline void *server_handling(void *params){
+    // recv msg
+    int msg_length;
+    char *recv_buffer = (char *)malloc(MAX_BYTES);
+
+    msg_length = read(*((int *) params), recv_buffer, MAX_BYTES);
+    printf("%d\n", (int)recv_buffer[0]);
+
+    // release the memory
+    free(params);
+    free(recv_buffer);
+}
+
 int main(int argc, char const* argv[]){
     /*
         1. Initialization
@@ -22,8 +35,7 @@ int main(int argc, char const* argv[]){
     /*
         2. Read from the source
     */
-    int fd_unified = 0, msg_length;
-    char recv_buffer[MAX_BYTES];
+    int fd_unified = 0;
 
     if (is_local){
         // ...
@@ -34,12 +46,16 @@ int main(int argc, char const* argv[]){
         int sock = 0;
         struct sockaddr_in address;
         server_init(SOCK_STREAM, &sock, &address, port_);
-        fd_unified = TCP_accept_with_server_fd(&sock, &address);
-    }
 
-        // 2.2: Unified read
-    msg_length = read(fd_unified, recv_buffer, MAX_BYTES);
-    printf("%d\n", (int)recv_buffer[0]);
+        while(fd_unified = TCP_accept_with_server_fd(&sock, &address)){
+            // pass the file discriptor to the sub-thread
+            int *ptr = (int *)malloc(4);
+            *ptr = fd_unified;
+            (*server_handling)((void *)ptr);
+
+            break; // only one time serve in present
+        }
+    }
 
     return 0;
 }
