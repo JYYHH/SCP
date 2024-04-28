@@ -1,3 +1,4 @@
+#pragma once
 #include <gcrypt.h>
 #include <stdio.h>
 #include <string.h>

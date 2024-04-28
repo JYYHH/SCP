@@ -41,18 +41,17 @@ int main(int argc, char const* argv[]){
         // talk to the remote server (purdec) directly
 
         struct sockaddr_in serv_addr;
-
         // client side init, TCP connection
         client_init(SOCK_STREAM, &fd_unified, &serv_addr, ip_, port_);
 
         // TCP socket will first build the connection
         TCP_connect(&fd_unified, &serv_addr);
-
-        // try...
-        msg_length = 1;
-        send_buffer[0] = 233;
-        send(fd_unified, send_buffer, msg_length, 0);
     }
+
+        // 2.2: Unifed write 
+    msg_length = 1;
+    send_buffer[0] = 66;
+    send(fd_unified, send_buffer, msg_length, 0);
 
     return 0;
 }

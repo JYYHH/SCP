@@ -35,9 +35,11 @@ int main(int argc, char const* argv[]){
         struct sockaddr_in address;
         server_init(SOCK_STREAM, &sock, &address, port_);
         fd_unified = TCP_accept_with_server_fd(&sock, &address);
-        msg_length = read(fd_unified, recv_buffer, MAX_BYTES);
-        printf("%d\n", (int)recv_buffer[0]);
     }
+
+        // 2.2: Unified read
+    msg_length = read(fd_unified, recv_buffer, MAX_BYTES);
+    printf("%d\n", (int)recv_buffer[0]);
 
     return 0;
 }
