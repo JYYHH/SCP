@@ -13,7 +13,7 @@ Tar_dec := $(BIN_DIR)/purdec
 # 3. Source 
 Src_enc := $(SRC_DIR)/enc.c
 Src_dec := $(SRC_DIR)/dec.c
-Src_common := $(SRC_DIR)/crypto.c
+Src_common := $(SRC_DIR)/crypto.c $(SRC_DIR)/network.c
 
 # 4. Build all the executable
 normal: $(Tar_enc) $(Tar_dec)
