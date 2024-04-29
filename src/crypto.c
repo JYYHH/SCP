@@ -36,7 +36,7 @@ inline void init_key(){
     /*
         2. Initialize the CIPHER
     */
-    // printf("Key = %x\n", *((int *)key));
+    printf("Key = %x\n", *((int *)key));
     gcry_cipher_open(&handle, GCRY_CIPHER, GCRY_MODE, 0);
     gcry_cipher_setkey(handle, key, key_len);
 
