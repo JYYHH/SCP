@@ -49,7 +49,7 @@ inline void init_key(){
 
 // need padding and unpadding, since the "gcry_cipher_encrypt" and "gcry_cipher_decrypt" only support length is multiple block_sz
 inline void padding_(unsigned char *buffer, int *len_pt){
-    int pad_size = (16 - (*len_pt & 0xf)) & 0xf; // block_size = 16
+    int pad_size = 16 - (*len_pt & 0xf); // block_size = 16
     printf("Padding size = %d\n", pad_size);
     if (pad_size == 0)
         return;
@@ -59,17 +59,11 @@ inline void padding_(unsigned char *buffer, int *len_pt){
 }
 
 inline void unpadding_(unsigned char *buffer, int *len_pt){
-    unsigned char pad_num = buffer[(*len_pt) - 1];
-    int pos = *len_pt;
-    for(pos--; buffer[pos] == pad_num; pos--);
-
-    if ((*len_pt) - (pos + 1) < pad_num){
-        // no padding
-        return;
+    unsigned char pad_size = buffer[(*len_pt) - 1];
+    printf("UNPadding size = %d\n", pad_size);
+    for (int i = 0; i < pad_size; i++, (*len_pt)--){
+        buffer[(*len_pt) - 1] = 0;
     }
-    printf("UNPadding size = %d\n", pad_num);
-    memset(buffer + (*len_pt) - pad_num, 0, pad_num); // reset to 0
-    *len_pt -= pad_num;
 }
 
 inline void encrypt(unsigned char *buffer, int len){

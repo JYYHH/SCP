@@ -18,7 +18,7 @@ inline void full_transfer(int in_fd, int out_fd, char *buffer, int type_){
     }
     else{
         // encrypt
-        while(msg_length = read(in_fd, buffer, MAX_BYTES - 32)){
+        while(msg_length = read(in_fd, buffer, MAX_BYTES - 48)){ // padding 16 + HMAC 32
             padding_((unsigned char *)buffer, &msg_length);
             encrypt((unsigned char *)buffer, msg_length);
             append_HMAC((unsigned char *)buffer, &msg_length);
