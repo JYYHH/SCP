@@ -10,10 +10,10 @@ inline void *server_handling(void *params){
         write(ptr->out_fd, recv_buffer, msg_length);
 
     // release the memory
-    free(params);
+    close(ptr->in_fd);
+    close(ptr->out_fd);
+    free(ptr);
     free(recv_buffer);
-    free(ptr->in_fd);
-    free(ptr->out_fd);
 }
 
 inline int open_target(char *file_name){
@@ -53,7 +53,21 @@ int main(int argc, char const* argv[]){
     int fd_unified = 0;
 
     if (is_local){
-        // ...
+        struct pthread_params *ptr 
+            = (struct pthread_params *)
+                malloc(
+                    sizeof(
+                        struct pthread_params
+                    )
+                );
+        ptr->in_fd = open(file_name, O_RDONLY, 0644);
+        file_name[Len - 4] = '\0';
+        ptr->out_fd = open_target(file_name);
+        if (ptr->out_fd >= 0 && ptr->in_fd >= 0)
+            (*server_handling)((void *)ptr);
+        else if (ptr->in_fd < 0){
+            printf("Input file does not exist, abort\n");
+        }
     }
     else{
         // initial version, just one time accept a client
@@ -91,6 +105,8 @@ int main(int argc, char const* argv[]){
             break; // only one time serve in present
         }
     }
+
+    free(file_name); // clean up
 
     return 0;
 }

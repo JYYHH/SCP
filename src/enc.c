@@ -35,7 +35,12 @@ int main(int argc, char const* argv[]){
     char send_buffer[MAX_BYTES];
 
     if (is_local){
-        // ...
+        char present[MAX_BYTES];
+        int len = strlen(file_name);
+        memcpy(present, file_name, len);
+        present[len] = '\0';
+        strcat(present, ".pur");
+        fd_unified = open(present, O_WRONLY | O_CREAT, 0644);
     }
     else{
         struct sockaddr_in serv_addr;
