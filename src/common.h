@@ -47,3 +47,8 @@ extern inline int TCP_accept_with_server_fd(
 // "dec.c"
 extern inline void *server_handling(void *params);
 extern inline int open_target(char *file_name);
+
+// "crypto.c"
+extern char *key, *password;
+extern int key_len, pass_len;
+extern inline void init_key();

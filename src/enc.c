@@ -29,6 +29,11 @@ int main(int argc, char const* argv[]){
     }
 
     /*
+        1.5: initialize the key
+    */
+    init_key();
+
+    /*
         2. Write to the target
     */
     int fd_unified = 0, msg_length;

@@ -48,6 +48,11 @@ int main(int argc, char const* argv[]){
     }
     
     /*
+        1.5: initialize the key
+    */
+    init_key();
+
+    /*
         2. Read from the source
     */
     int fd_unified = 0;
