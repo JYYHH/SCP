@@ -32,11 +32,12 @@ int main(int argc, char const* argv[]){
         1.5: initialize the key
     */
     init_key();
+    init_cipher();
 
     /*
         2. Write to the target
     */
-    int fd_unified = 0, msg_length;
+    int fd_unified = 0;
     char send_buffer[MAX_BYTES];
 
     if (is_local){
@@ -61,8 +62,7 @@ int main(int argc, char const* argv[]){
         // 2.2: Unifed write 
 
     if (tmp == 0){
-        while(msg_length = read(in_fd, send_buffer, MAX_BYTES))
-            write(fd_unified, send_buffer, msg_length);
+        full_transfer(in_fd, fd_unified, send_buffer, 0);
     }
     else{
         printf("File already exists (local or remote side), abort\n");
@@ -73,6 +73,7 @@ int main(int argc, char const* argv[]){
     */
     close(in_fd);
     close(fd_unified);
+    close_cry();
 
     return 0;
 }

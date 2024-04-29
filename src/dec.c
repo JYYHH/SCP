@@ -2,18 +2,17 @@
 
 inline void *server_handling(void *params){
     // recv msg
-    int msg_length;
     char *recv_buffer = (char *)malloc(MAX_BYTES);
     struct pthread_params *ptr = params;
 
-    while(msg_length = read(ptr->in_fd, recv_buffer, MAX_BYTES))
-        write(ptr->out_fd, recv_buffer, msg_length);
+    full_transfer(ptr->in_fd, ptr->out_fd, recv_buffer, 1);
 
     // release the memory
     close(ptr->in_fd);
     close(ptr->out_fd);
     free(ptr);
     free(recv_buffer);
+    close_cry();
 }
 
 inline int open_target(char *file_name){
@@ -51,6 +50,7 @@ int main(int argc, char const* argv[]){
         1.5: initialize the key
     */
     init_key();
+    init_cipher();
 
     /*
         2. Read from the source
