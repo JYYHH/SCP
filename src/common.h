@@ -17,6 +17,7 @@
 struct pthread_params{
 	int in_fd;
 	int out_fd;
+    int whether_remote;
 };
 
 // "network.c"
@@ -65,4 +66,4 @@ extern inline int check_integrity(unsigned char *buffer, int *len_pt);
 extern inline void close_cry();
 
 // "util.c"
-extern inline void full_transfer(int in_fd, int out_fd, char *buffer, int type_);
+extern inline void full_transfer(int in_fd, int out_fd, char *buffer, int type_, int whether_remote);
