@@ -36,8 +36,9 @@ inline void init_key(){
     /*
         2. Initialize the CIPHER
     */
-    printf("Key = %x\n", *((int *)key));
-    gcry_cipher_open(&handle, GCRY_CIPHER, GCRY_MODE, 0);
+    // printf("Key = %x\n", *((int *)key));
+        // Algorithm: AES256, Mode: CBC
+    gcry_cipher_open(&handle, GCRY_CIPHER_AES256, GCRY_CIPHER_MODE_CBC, 0);
     gcry_cipher_setkey(handle, key, key_len);
 
     /*
@@ -47,28 +48,35 @@ inline void init_key(){
     gcry_md_setkey(handle_HMAC, key, key_len);
 }
 
-// need padding and unpadding, since the "gcry_cipher_encrypt" and "gcry_cipher_decrypt" only support length is multiple block_sz
+// need padding and unpadding, since the "gcry_cipher_encrypt" and "gcry_cipher_decrypt" only support block_size|length
 inline void padding_(unsigned char *buffer, int *len_pt){
     int pad_size = 16 - (*len_pt & 0xf); // block_size = 16
     printf("Padding size = %d\n", pad_size);
-    if (pad_size == 0)
-        return;
     for (int i = 0; i < pad_size; i++, (*len_pt)++){
         buffer[*len_pt] = pad_size;
     }
 }
 
-inline void unpadding_(unsigned char *buffer, int *len_pt){
+inline int unpadding_(unsigned char *buffer, int *len_pt){
     unsigned char pad_size = buffer[(*len_pt) - 1];
     printf("UNPadding size = %d\n", pad_size);
+    // check for unpad..
+    if (pad_size > 16)
+        return 1;
+    for (int i = (*len_pt) - pad_size; i < (*len_pt); i++)
+        if (buffer[i] != pad_size)
+            return 1;
+
     for (int i = 0; i < pad_size; i++, (*len_pt)--){
         buffer[(*len_pt) - 1] = 0;
     }
+    return 0;
 }
 
 inline void encrypt(unsigned char *buffer, int len){
     static const unsigned char iv[16] = "1234567890123456"; 
     gcry_cipher_setiv(handle, iv, sizeof(iv));
+    // operate in place
     gcry_cipher_encrypt(
         handle, 
         buffer, 
@@ -81,6 +89,7 @@ inline void encrypt(unsigned char *buffer, int len){
 inline void decrypt(unsigned char *buffer, int len){
     static const unsigned char iv[16] = "1234567890123456"; 
     gcry_cipher_setiv(handle, iv, sizeof(iv));
+    // operate in place
     gcry_cipher_decrypt(
         handle, 
         buffer, 
@@ -90,6 +99,7 @@ inline void decrypt(unsigned char *buffer, int len){
     );
 }
 
+// append the hash value to the back of msg chunck
 inline void append_HMAC(unsigned char *buffer, int *len_pt){ // here 16|len must stand
     unsigned char *hmac;
     gcry_md_write(handle_HMAC, buffer, *len_pt);
@@ -98,6 +108,7 @@ inline void append_HMAC(unsigned char *buffer, int *len_pt){ // here 16|len must
     (*len_pt) += 32;
 }
 
+// check the hash value, then remove it.
 inline int check_integrity(unsigned char *buffer, int *len_pt){
     unsigned char *hmac;
     (*len_pt) -= 32;
@@ -106,6 +117,7 @@ inline int check_integrity(unsigned char *buffer, int *len_pt){
     return (memcmp(hmac, buffer + (*len_pt), 32) == 0);
 }
 
+// clean-up
 inline void close_cry(){
     free(key);
     free(password);

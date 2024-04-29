@@ -1,6 +1,9 @@
 // my wrapper for the network workload
 #include "common.h"
 
+/*
+    Initialization for the client side
+*/
 inline void client_init(
                         int type, 
                         int *sock_p, 
@@ -25,6 +28,10 @@ inline void client_init(
     address->sin_addr = *((struct in_addr *)(host->h_addr));
 }
 
+/*
+    Connect to the server
+*/
+
 inline void TCP_connect(
                         int *sock_p, 
                         struct sockaddr_in *address
@@ -41,6 +48,10 @@ inline void TCP_connect(
 		exit(0);
 	}
 }
+
+/*
+    Initialization for the server side
+*/
 
 inline void server_init(
                         int type, 
@@ -84,6 +95,9 @@ inline void server_init(
     }
 }
 
+/*
+    wait (block) until recv a connection req from client, then return the new fd to read/write on
+*/
 inline int TCP_accept_with_server_fd(
                         int *sock_p, 
                         struct sockaddr_in *address

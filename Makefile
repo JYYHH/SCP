@@ -3,7 +3,7 @@ SRC_DIR := src
 BIN_DIR := bin
 DATA_DIR := data
 CC := gcc
-FLAGS := -o
+FLAGS := -Wall -lgcrypt -o
 HEADER := $(SRC_DIR)/common.h
 
 # 2. Target
@@ -18,9 +18,9 @@ Src_common := $(SRC_DIR)/crypto.c $(SRC_DIR)/network.c $(SRC_DIR)/util.c
 # 4. Build all the executable
 normal: $(BIN_DIR) $(DATA_DIR) $(Tar_enc) $(Tar_dec)
 $(Tar_enc): $(HEADER) $(Src_enc) $(Src_common)
-	$(CC) $(FLAGS) $@ $^ -lgcrypt
+	$(CC) $^ $(FLAGS) $@
 $(Tar_dec): $(HEADER) $(Src_dec) $(Src_common)
-	$(CC) $(FLAGS) $@ $^ -lgcrypt
+	$(CC) $^ $(FLAGS) $@
 $(BIN_DIR):
 	mkdir -p bin
 $(DATA_DIR):

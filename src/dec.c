@@ -1,5 +1,6 @@
 #include "common.h"
 
+// the main routine of server/recver
 inline void *server_handling(void *params){
     // recv msg
     char *recv_buffer = (char *)malloc(MAX_BYTES);
@@ -15,6 +16,7 @@ inline void *server_handling(void *params){
     close_cry();
 }
 
+// try to open a file through file_name, but return error if already exists
 inline int open_target(char *file_name){
     // protocol: file name through network is without extra suffix like ".pur"
     if (access(file_name, F_OK) == 0){
@@ -31,7 +33,7 @@ int main(int argc, char const* argv[]){
     */
     char *file_name = (char *)malloc(MAX_BYTES), *port_ = argv[1], tmp = 0;
     int is_local = 0, option, Len;
-
+    
     while((option = getopt(argc, argv, "l:")) > 0){
         switch(option) {
             case 'l':
@@ -42,6 +44,7 @@ int main(int argc, char const* argv[]){
                 break;
             default:
                 printf("Unknown option %c\n", option);
+                free(file_name);
                 exit(1);
         }
     }
@@ -64,8 +67,8 @@ int main(int argc, char const* argv[]){
                         struct pthread_params
                     )
                 );
-        ptr->in_fd = open(file_name, O_RDONLY, 0644);
-        file_name[Len - 4] = '\0';
+        ptr->in_fd = open(file_name, O_RDONLY, 0644); // input fd is from local
+        file_name[Len - 4] = '\0';                    // output file name should remove suffix ".pur"
         ptr->out_fd = open_target(file_name);
         if (ptr->out_fd >= 0 && ptr->in_fd >= 0)
             (*server_handling)((void *)ptr);
@@ -81,11 +84,11 @@ int main(int argc, char const* argv[]){
         server_init(SOCK_STREAM, &sock, &address, port_);
 
         while(fd_unified = TCP_accept_with_server_fd(&sock, &address)){
+            // read file_name from sender
             int rmt_len = read(fd_unified, file_name, MAX_BYTES);
             file_name[rmt_len] = '\0';
-            printf("%s\n", file_name);
+            printf("Recv file name: %s (from sender)\n", file_name);
 
-            // pass the file discriptor to the sub-thread
             struct pthread_params *ptr 
                 = (struct pthread_params *)
                     malloc(
@@ -93,10 +96,10 @@ int main(int argc, char const* argv[]){
                             struct pthread_params
                         )
                     );
-            ptr->in_fd = fd_unified;
-            ptr->out_fd = open_target(file_name);
+            ptr->in_fd = fd_unified;  // input fd is from network
+            ptr->out_fd = open_target(file_name); // file_name already without suffix ".pur"
             tmp = (ptr->out_fd < 0);
-            write(fd_unified, &tmp, 1);
+            write(fd_unified, &tmp, 1); // tell the sender whether already exist
 
             if (tmp){
                 close(fd_unified);
@@ -104,8 +107,7 @@ int main(int argc, char const* argv[]){
                 break;
             }
 
-            (*server_handling)((void *)ptr);
-
+            (*server_handling)((void *)ptr); // TODO-JHY: use pthread instead of directly function call later
             break; // only one time serve in present
         }
     }

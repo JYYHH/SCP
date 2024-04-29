@@ -20,11 +20,14 @@ int main(int argc, char const* argv[]){
                 break;
             default:
                 printf("Unknown option %c\n", option);
+                close(in_fd);
                 exit(1);
         }
-    }
+    }   
+    // can't do both local and remote write in present
     if (is_local && ip_){
         printf("Want both local and remote, conflict..\n");
+        close(in_fd);
         exit(1);
     }
 
@@ -54,7 +57,7 @@ int main(int argc, char const* argv[]){
 
         // TCP socket will first build the connection
         TCP_connect(&fd_unified, &serv_addr);
-        write(fd_unified, file_name, strlen(file_name));
+        write(fd_unified, file_name, strlen(file_name)); // send file name to the recver
         read(fd_unified, &tmp, 1); // get the feedback
     }
 

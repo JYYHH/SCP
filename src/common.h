@@ -11,8 +11,6 @@
 #include <netinet/in.h>
 
 #define MAX_BYTES 1024
-#define GCRY_CIPHER GCRY_CIPHER_AES256
-#define GCRY_MODE GCRY_CIPHER_MODE_CBC
 
 struct pthread_params{
 	int in_fd;
@@ -51,13 +49,9 @@ extern inline void *server_handling(void *params);
 extern inline int open_target(char *file_name);
 
 // "crypto.c"
-extern unsigned char *key;
-extern char *password;
-extern int key_len, pass_len;
-extern gcry_cipher_hd_t handle;
 extern inline void init_key();
 extern inline void padding_(unsigned char *buffer, int *len_pt);
-extern inline void unpadding_(unsigned char *buffer, int *len_pt);
+extern inline int unpadding_(unsigned char *buffer, int *len_pt);
 extern inline void encrypt(unsigned char *buffer, int len);
 extern inline void decrypt(unsigned char *buffer, int len);
 extern inline void append_HMAC(unsigned char *buffer, int *len_pt);
