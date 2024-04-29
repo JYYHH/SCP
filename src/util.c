@@ -1,5 +1,21 @@
 #include "common.h"
 
+int present_thread;
+pthread_t *thread_arr; 
+int global_server_sock;
+
+// for server's quit
+inline void sigint_handler(int sig){
+    printf("\nCaught SIGINT, AND The server will quit safely!\n");
+    // wait for all sub-threads
+	for(int i = 0; i < present_thread; i++)
+		pthread_join(thread_arr[i], NULL);
+	// clean-up
+	shutdown(global_server_sock, SHUT_RDWR);
+    close_cry();
+    exit(0);   
+}    
+
 /*
     add for real world remote (insteed of local network) transmission.
     Although through TCP and we can also set flags of recv() to wait for as many bytes delivered,

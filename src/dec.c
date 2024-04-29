@@ -13,7 +13,7 @@ inline void *server_handling(void *params){
     close(ptr->out_fd);
     free(ptr);
     free(recv_buffer);
-    close_cry();
+    // close_cry();
 }
 
 // try to open a file through file_name, but return error if already exists
@@ -31,7 +31,7 @@ int main(int argc, char const* argv[]){
     /*
         1. Initialization
     */
-    char *file_name = (char *)malloc(MAX_BYTES), *port_ = argv[1], tmp = 0;
+    char file_name[MAX_BYTES], *port_ = argv[1], tmp = 0;
     int is_local = 0, option, Len;
     
     while((option = getopt(argc, argv, "l:")) > 0){
@@ -44,7 +44,6 @@ int main(int argc, char const* argv[]){
                 break;
             default:
                 printf("Unknown option %c\n", option);
-                free(file_name);
                 exit(1);
         }
     }
@@ -78,10 +77,13 @@ int main(int argc, char const* argv[]){
     }
     else{
         // initial version, just one time accept a client
-            // (TODO-JHY): add multithreading version..
         int sock = 0;
         struct sockaddr_in address;
         server_init(SOCK_STREAM, &sock, &address, port_);
+        global_server_sock = sock;
+        present_thread = 0;
+        thread_arr = (pthread_t *)malloc(MAX_THREADS * sizeof(pthread_t));
+
 
         while(fd_unified = TCP_accept_with_server_fd(&sock, &address)){
             // read file_name from sender
@@ -103,16 +105,16 @@ int main(int argc, char const* argv[]){
 
             if (tmp){
                 close(fd_unified);
-                // continue;
-                break;
+                continue;
             }
-
-            (*server_handling)((void *)ptr); // TODO-JHY: use pthread instead of directly function call later
-            break; // only one time serve in present
+            pthread_create(
+                &thread_arr[present_thread ++], 
+                NULL, 
+                server_handling, 
+                (void *)ptr
+            );
         }
     }
-
-    free(file_name); // clean up
 
     return 0;
 }

@@ -93,6 +93,9 @@ inline void server_init(
         perror("listen");
         exit(EXIT_FAILURE);
     }
+    // init the signal handler
+    if (signal(SIGINT, sigint_handler) == SIG_ERR)
+        perror("signal error"); 
 }
 
 /*
