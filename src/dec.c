@@ -5,7 +5,7 @@ inline void *server_handling(void *params){
     char *recv_buffer = (char *)malloc(MAX_BYTES);
     struct pthread_params *ptr = params;
 
-    full_transfer(ptr->in_fd, ptr->out_fd, recv_buffer, 1, ptr->whether_remote);
+    full_transfer(ptr->in_fd, ptr->out_fd, recv_buffer, 1);
 
     // release the memory
     close(ptr->in_fd);
@@ -67,7 +67,6 @@ int main(int argc, char const* argv[]){
         ptr->in_fd = open(file_name, O_RDONLY, 0644);
         file_name[Len - 4] = '\0';
         ptr->out_fd = open_target(file_name);
-        ptr->whether_remote = 0;
         if (ptr->out_fd >= 0 && ptr->in_fd >= 0)
             (*server_handling)((void *)ptr);
         else if (ptr->in_fd < 0){
@@ -96,7 +95,6 @@ int main(int argc, char const* argv[]){
                     );
             ptr->in_fd = fd_unified;
             ptr->out_fd = open_target(file_name);
-            ptr->whether_remote = 1;
             tmp = (ptr->out_fd < 0);
             write(fd_unified, &tmp, 1);
 

@@ -1,17 +1,23 @@
 #include "common.h"
 
-inline void full_transfer(int in_fd, int out_fd, char *buffer, int type_, int whether_remote){
+inline int read_from_network(int fd, char *buffer, int max_bytes){
+    int total_bytes = 0, msg_length;
+    while(total_bytes < max_bytes){
+        msg_length = read(fd, buffer + total_bytes, max_bytes - total_bytes);
+        if (msg_length <= 0)
+            break;
+        total_bytes += msg_length;
+    }
+
+    return total_bytes;
+}
+
+inline void full_transfer(int in_fd, int out_fd, char *buffer, int type_){
     // type_ == 0: encrypt / 1: decrypt
     int msg_length;
     if (type_){
         // decrypt
-        while(1){
-            if (whether_remote)
-                msg_length = recv(in_fd, buffer, MAX_BYTES, MSG_WAITALL);
-            else
-                msg_length = read(in_fd, buffer, MAX_BYTES);
-            if (msg_length == 0)
-                break;
+        while(msg_length = read_from_network(in_fd, buffer, MAX_BYTES)){
             // first check integrity
             printf("%d\n", msg_length);
             int ret = check_integrity((unsigned char *)buffer, &msg_length);
