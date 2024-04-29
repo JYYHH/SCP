@@ -4,4 +4,10 @@
 - GNU Make 4.2.1
 - libgcrypt20
 
+## 1. Compile
+```bash
+# working dir: SCP/
+make
+```
 
+## 2. Run
