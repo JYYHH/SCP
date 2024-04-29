@@ -3,7 +3,7 @@
 unsigned char *key;
 char *password;
 int key_len, pass_len;
-gcry_cipher_hd_t handle;
+gcry_cipher_hd_t handle, handle_HMAC;
 
 inline void init_key(){
     gcry_control(GCRYCTL_SUSPEND_SECMEM_WARN);
@@ -12,6 +12,9 @@ inline void init_key(){
     gcry_control(GCRYCTL_INITIALIZATION_FINISHED, 0);
     // finish gcrypt initialization
 
+    /*
+        1. from password build key
+    */
     key = (unsigned char *)malloc(32);
     password = (char *)malloc(MAX_BYTES);
     printf("Password: ");
@@ -30,12 +33,18 @@ inline void init_key(){
         key_len, key
     );
 
+    /*
+        2. Initialize the CIPHER
+    */
     // printf("Key = %x\n", *((int *)key));
-}
-
-inline void init_cipher(){
     gcry_cipher_open(&handle, GCRY_CIPHER, GCRY_MODE, 0);
     gcry_cipher_setkey(handle, key, key_len);
+
+    /*
+        3. Initialize the HMAC
+    */
+    gcry_md_open(&handle_HMAC, GCRY_MD_SHA256, GCRY_MD_FLAG_HMAC);
+    gcry_md_setkey(handle_HMAC, key, key_len);
 }
 
 // need padding and unpadding, since the "gcry_cipher_encrypt" and "gcry_cipher_decrypt" only support length is multiple block_sz
@@ -58,6 +67,7 @@ inline void unpadding_(unsigned char *buffer, int *len_pt){
         // no padding
         return;
     }
+    printf("UNPadding size = %d\n", pad_num);
     memset(buffer + (*len_pt) - pad_num, 0, pad_num); // reset to 0
     *len_pt -= pad_num;
 }
@@ -86,8 +96,25 @@ inline void decrypt(unsigned char *buffer, int len){
     );
 }
 
+inline void append_HMAC(unsigned char *buffer, int *len_pt){ // here 16|len must stand
+    unsigned char *hmac;
+    gcry_md_write(handle_HMAC, buffer, *len_pt);
+    hmac = gcry_md_read(handle_HMAC, GCRY_MD_SHA256);
+    memcpy(buffer + (*len_pt), hmac, 32);
+    (*len_pt) += 32;
+}
+
+inline int check_integrity(unsigned char *buffer, int *len_pt){
+    unsigned char *hmac;
+    (*len_pt) -= 32;
+    gcry_md_write(handle_HMAC, buffer, *len_pt);
+    hmac = gcry_md_read(handle_HMAC, GCRY_MD_SHA256);
+    return (memcmp(hmac, buffer + (*len_pt), 32) == 0);
+}
+
 inline void close_cry(){
     free(key);
     free(password);
     gcry_cipher_close(handle);
+    gcry_md_close(handle_HMAC);
 }

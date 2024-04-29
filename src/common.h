@@ -56,11 +56,12 @@ extern char *password;
 extern int key_len, pass_len;
 extern gcry_cipher_hd_t handle;
 extern inline void init_key();
-extern inline void init_cipher();
 extern inline void padding_(unsigned char *buffer, int *len_pt);
 extern inline void unpadding_(unsigned char *buffer, int *len_pt);
 extern inline void encrypt(unsigned char *buffer, int len);
 extern inline void decrypt(unsigned char *buffer, int len);
+extern inline void append_HMAC(unsigned char *buffer, int *len_pt);
+extern inline int check_integrity(unsigned char *buffer, int *len_pt);
 extern inline void close_cry();
 
 // "util.c"

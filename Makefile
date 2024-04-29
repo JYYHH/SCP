@@ -27,4 +27,4 @@ $(DATA_DIR):
 	mkdir -p data
 # 5. Clean up
 clean: 
-	rm -f bin/* data/*
+	rm -f bin/*
