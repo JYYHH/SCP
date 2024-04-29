@@ -4,8 +4,8 @@ int main(int argc, char const* argv[]){
     /*
         1. Initialization
     */
-    char *ip_ = NULL, *port_ = NULL, *file_name = argv[1], *split = NULL;
-    int is_local = 0, option;
+    char *ip_ = NULL, *port_ = NULL, *file_name = argv[1], *split = NULL, tmp = 0;
+    int is_local = 0, option, in_fd = open(file_name, O_RDONLY, 0644);
 
     while((option = getopt(argc, argv, "d:l")) > 0){
         switch(option) {
@@ -38,20 +38,31 @@ int main(int argc, char const* argv[]){
         // ...
     }
     else{
-        // talk to the remote server (purdec) directly
-
         struct sockaddr_in serv_addr;
         // client side init, TCP connection
         client_init(SOCK_STREAM, &fd_unified, &serv_addr, ip_, port_);
 
         // TCP socket will first build the connection
         TCP_connect(&fd_unified, &serv_addr);
+        write(fd_unified, file_name, strlen(file_name));
+        read(fd_unified, &tmp, 1); // get the feedback
     }
 
         // 2.2: Unifed write 
-    msg_length = 1;
-    send_buffer[0] = 66;
-    send(fd_unified, send_buffer, msg_length, 0);
+
+    if (tmp == 0){
+        while(msg_length = read(in_fd, send_buffer, MAX_BYTES))
+            write(fd_unified, send_buffer, msg_length);
+    }
+    else{
+        printf("File already exists (local or remote side), abort\n");
+    }
+
+    /*
+        3. end the program
+    */
+    close(in_fd);
+    close(fd_unified);
 
     return 0;
 }

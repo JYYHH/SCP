@@ -16,12 +16,15 @@ Src_dec := $(SRC_DIR)/dec.c
 Src_common := $(SRC_DIR)/crypto.c $(SRC_DIR)/network.c
 
 # 4. Build all the executable
-normal: $(Tar_enc) $(Tar_dec)
+normal: $(BIN_DIR) $(DATA_DIR) $(Tar_enc) $(Tar_dec)
 $(Tar_enc): $(HEADER) $(Src_enc) $(Src_common)
 	$(CC) $(FLAGS) $@ $^
 $(Tar_dec): $(HEADER) $(Src_dec) $(Src_common)
 	$(CC) $(FLAGS) $@ $^
-
+$(BIN_DIR):
+	mkdir -p bin
+$(DATA_DIR):
+	mkdir -p data
 # 5. Clean up
 clean: 
 	rm -f bin/* data/*

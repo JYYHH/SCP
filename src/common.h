@@ -6,10 +6,16 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <fcntl.h>
 #include <stdlib.h>
 #include <netinet/in.h>
 
 #define MAX_BYTES 1024
+
+struct pthread_params{
+	int in_fd;
+	int out_fd;
+};
 
 // "network.c"
     // client (purenc) side initialization
@@ -40,3 +46,4 @@ extern inline int TCP_accept_with_server_fd(
 
 // "dec.c"
 extern inline void *server_handling(void *params);
+extern inline int open_target(char *file_name);
