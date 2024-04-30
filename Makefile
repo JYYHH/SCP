@@ -3,7 +3,7 @@ SRC_DIR := src
 BIN_DIR := bin
 DATA_DIR := data
 CC := gcc
-FLAGS := -Wall -lgcrypt -o
+FLAGS := -w -lgcrypt -o
 HEADER := $(SRC_DIR)/common.h
 
 # 2. Target
