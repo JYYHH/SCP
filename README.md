@@ -68,9 +68,23 @@ bash ./autotest_network_single_thread.sh <data_file_name> <your_password>
 ```
 - This test script will first launch the server backgroundly, then trigger the client to send.
 - It also provides the log files in `log/` to see the client's and server's log
+- __In this and later sections, the default port we use is `8888`__
 
 ## 5. Auto (Local) Multithreading Network Test
 ```bash
 bash ./autotest_network_multiple_threads.sh <data_file_name> <your_password>
 ```
 - In addition to 4., it provides multithreading check for the receiver, which is crucial when multiple clients are sending their data to you.
+
+## 6. Remote Network Test
+### 6.1 Launch the server 
+```bash
+bash ./recver.sh <data_file_name> <your_password>
+```
+### 6.2 Send data
+```bash
+bash ./sender.sh <data_file_name> <your_password> <remote_ip_addr>
+```
+### 6.3 Completion
+- after the server side's terminal stop to output for several seconds, you can type `Ctrl+C` in it, this will send a `SIGINT` signal to the "purdec" program, safely terminate it, and then begin to compare the files received with the std file.
+
