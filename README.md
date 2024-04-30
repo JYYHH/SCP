@@ -1,3 +1,6 @@
+- My name: Haoyu Jin
+- My email: jin511@purdue.edu
+
 ## 0. Environment
 - Ubuntu 20.04 x86_64 GNU/Linux
 - gcc (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0
@@ -53,4 +56,43 @@ purdec 7777
     - `an_executable` is a historical verision of a binary (`purenc`/`purdec`)
     - `random` is a file of random byte sequence, and with size around `10M`, which aims to show the robustness of the program
     - ___All the above files are also passed for the remote tests, using two remote machines___
+### 3.1 Usage example
+```bash
+bash ./autotest_local.sh random
+```
 
+## 4. Sorce files
+- see directory `src/`, along with `Makefile`
+
+## 5. Overview of work accomplished
+- I build the TCP socket for the network programming
+- I build the key from password
+- I encrypt the data, and then add a hash suffix before sending it to the network
+    - on the receiver side, symmetrical actions are taken.
+- I support the multithreading version of receiver, and more public-key based certification process on another branch `real`. (not required in this assignment)
+
+## 6. Description of code and code layout
+- Here I only explain the main content about each source file, please check the comment in source files to get the detail of each function
+1. `dec.c`: main routine of receiver
+2. `enc.c`: main routine of sender
+3. `network.c`: my wrapper for building and using the socket
+4. `crypto.c`: functions used for crypto purpose, building on `<gcrypt.h>`
+5. `util.c`: extension for `dec.c` and `enc.c`
+
+## 7. General comments and design decisions made
+- see the source codes for comments 
+- Design Decision:
+    - for both local and remote mode, the `enc` should encrypt and append a hash before sending msg chunk, the `dec` should checking the hash and decrypt after receiving msg chunk.
+
+## 8. Answer to the question
+- I need a salt string
+- It's used to protect the key, since directly mapping password to key may suffer a type of attack which uses brute force to sampling the mapping function.
+    - The salt is like a user-specific characteristic.
+- In this project, the salt just stays constant through both sides, for the simplicity.
+
+## 9. Number of hours spent on the project and level of effort required
+- 3 days, be stopped by a misfortune (delete the source code unconciously) for 1 day and more..
+- workload is similar to lab2 (MiniVPN)
+
+## -1. What's more?
+- see branch `real` to see my progress on developing this project into more real-world-like senario.

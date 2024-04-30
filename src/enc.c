@@ -24,12 +24,13 @@ int main(int argc, char const* argv[]){
                 exit(1);
         }
     }   
-    // can't do both local and remote write in present
-    if (is_local && ip_){
-        printf("Want both local and remote, conflict..\n");
-        close(in_fd);
-        exit(1);
-    }
+    // now we can do this... since they're actually orthogonal
+    // // can't do both local and remote write in present
+    // if (is_local && ip_){
+    //     printf("Want both local and remote, conflict..\n");
+    //     close(in_fd);
+    //     exit(1);
+    // }
 
     /*
         1.5: initialize the key
@@ -49,8 +50,10 @@ int main(int argc, char const* argv[]){
         present[len] = '\0';
         strcat(present, ".pur");
         fd_unified = open(present, O_WRONLY | O_CREAT, 0644);
+        full_transfer(in_fd, fd_unified, send_buffer, 0);
+        in_fd = open(file_name, O_RDONLY, 0644);
     }
-    else{
+    if (ip_ != NULL){
         struct sockaddr_in serv_addr;
         // client side init, TCP connection
         client_init(SOCK_STREAM, &fd_unified, &serv_addr, ip_, port_);
@@ -59,15 +62,11 @@ int main(int argc, char const* argv[]){
         TCP_connect(&fd_unified, &serv_addr);
         write(fd_unified, file_name, strlen(file_name)); // send file name to the recver
         read(fd_unified, &tmp, 1); // get the feedback
-    }
-
-        // 2.2: Unifed write 
-
-    if (tmp == 0){
-        full_transfer(in_fd, fd_unified, send_buffer, 0); // the last parameter for the sender is useless, just feel free
-    }
-    else{
-        printf("File already exists (local or remote side), abort\n");
+        if (tmp == 0)
+            full_transfer(in_fd, fd_unified, send_buffer, 0);
+        else{
+            printf("File already exists (local or remote side), abort\n");
+        }
     }
 
     /*
