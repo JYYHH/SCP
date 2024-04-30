@@ -46,6 +46,9 @@ purdec 7777
 ```
 
 ## 3. Auto Local Test
+```bash
+bash ./autotest_local.sh <data_file_name> <your_password>
+```
 - This script along with files under `data` directory helps you check the correctness and functionality for the local run
 - And you can directly run this script right after you download this repo to your machine and cd into it, instead of compiling first (running `make`).
 - one parameter is needed, which is the file name (choose one from `data/`)
@@ -56,5 +59,18 @@ purdec 7777
 
 ### 3.1 Usage example
 ```bash
-bash ./autotest_local.sh random
+bash ./autotest_local.sh random 2333
 ```
+
+## 4. Auto (Local) Network Test
+```bash
+bash ./autotest_network_single_thread.sh <data_file_name> <your_password>
+```
+- This test script will first launch the server backgroundly, then trigger the client to send.
+- It also provides the log files in `log/` to see the client's and server's log
+
+## 5. Auto (Local) Multithreading Network Test
+```bash
+bash ./autotest_network_multiple_threads.sh <data_file_name> <your_password>
+```
+- In addition to 4., it provides multithreading check for the receiver, which is crucial when multiple clients are sending their data to you.

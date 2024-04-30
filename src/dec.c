@@ -83,7 +83,7 @@ int main(int argc, char const* argv[]){
         global_server_sock = sock;
         present_thread = 0;
         thread_arr = (pthread_t *)malloc(MAX_THREADS * sizeof(pthread_t));
-        pthread_mutex_init(mutex, NULL);
+        pthread_mutex_init(&mutex, NULL);
 
         while(fd_unified = TCP_accept_with_server_fd(&sock, &address)){
             // read file_name from sender

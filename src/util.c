@@ -51,7 +51,8 @@ inline void full_transfer(int in_fd, int out_fd, char *buffer, int type_){
         // decrypt
         while(msg_length = read_from_network(in_fd, buffer, MAX_BYTES)){ // may from network, but act identical as 'read' when from local
             pthread_mutex_lock(&mutex);
-            printf("THREAD %d read %d bytes from network/local\n", pthread_self(), msg_length);
+            // we ensure MAX_THREADS = 2^k
+            printf("THREAD %d read %d bytes from network/local\n", pthread_self() & (MAX_THREADS - 1), msg_length);
             // first check integrity
             int ret = check_integrity((unsigned char *)buffer, &msg_length);
             if (!ret){
@@ -62,9 +63,11 @@ inline void full_transfer(int in_fd, int out_fd, char *buffer, int type_){
             // unpad
                 // TODO-JHY: later implementation, use the return value of it to delete incorrect transmission
             unpadding_((unsigned char *)buffer, &msg_length);
-            printf("THREAD %d write %d bytes to local\n", pthread_self(), msg_length);
-            write(out_fd, buffer, msg_length);
+            printf("THREAD %d write %d bytes to local\n", pthread_self() & (MAX_THREADS) - 1, msg_length);
             pthread_mutex_unlock(&mutex);
+            
+            // in order to improve the performance, this write should not be in the sritical section
+            write(out_fd, buffer, msg_length);
         }
     }
     else{
