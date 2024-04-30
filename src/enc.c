@@ -64,7 +64,7 @@ int main(int argc, char const* argv[]){
         // 2.2: Unifed write 
 
     if (tmp == 0){
-        full_transfer(in_fd, fd_unified, send_buffer, 0); // the last parameter for the sender is useless, just feel free
+        full_transfer(in_fd, fd_unified, send_buffer, 0);
     }
     else{
         printf("File already exists (local or remote side), abort\n");

@@ -76,14 +76,14 @@ int main(int argc, char const* argv[]){
         }
     }
     else{
-        // initial version, just one time accept a client
+        // initial some variables
         int sock = 0;
         struct sockaddr_in address;
         server_init(SOCK_STREAM, &sock, &address, port_);
         global_server_sock = sock;
         present_thread = 0;
         thread_arr = (pthread_t *)malloc(MAX_THREADS * sizeof(pthread_t));
-
+        pthread_mutex_init(mutex, NULL);
 
         while(fd_unified = TCP_accept_with_server_fd(&sock, &address)){
             // read file_name from sender

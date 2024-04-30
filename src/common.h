@@ -65,6 +65,7 @@ extern inline void close_cry();
 extern int present_thread;
 extern pthread_t *thread_arr; 
 extern int global_server_sock;
+extern pthread_mutex_t mutex;
 extern inline void sigint_handler(int sig);
 extern inline int read_from_network(int fd, char *buffer, int max_bytes);
 extern inline void full_transfer(int in_fd, int out_fd, char *buffer, int type_);

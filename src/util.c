@@ -3,6 +3,7 @@
 int present_thread;
 pthread_t *thread_arr; 
 int global_server_sock;
+pthread_mutex_t mutex;
 
 // for server's quit
 inline void sigint_handler(int sig){
@@ -49,7 +50,8 @@ inline void full_transfer(int in_fd, int out_fd, char *buffer, int type_){
     if (type_){
         // decrypt
         while(msg_length = read_from_network(in_fd, buffer, MAX_BYTES)){ // may from network, but act identical as 'read' when from local
-            printf("read %d bytes from network/local\n", msg_length);
+            pthread_mutex_lock(&mutex);
+            printf("THREAD %d read %d bytes from network/local\n", pthread_self(), msg_length);
             // first check integrity
             int ret = check_integrity((unsigned char *)buffer, &msg_length);
             if (!ret){
@@ -60,8 +62,9 @@ inline void full_transfer(int in_fd, int out_fd, char *buffer, int type_){
             // unpad
                 // TODO-JHY: later implementation, use the return value of it to delete incorrect transmission
             unpadding_((unsigned char *)buffer, &msg_length);
-            printf("write %d bytes to local\n", msg_length);
+            printf("THREAD %d write %d bytes to local\n", pthread_self(), msg_length);
             write(out_fd, buffer, msg_length);
+            pthread_mutex_unlock(&mutex);
         }
     }
     else{
