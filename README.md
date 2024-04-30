@@ -54,3 +54,7 @@ purdec 7777
     - `random` is a file of random byte sequence, and with size around `10M`, which aims to show the robustness of the program
     - ___All the above files are also passed for the remote tests, using two remote machines___
 
+### 3.1 Usage example
+```bash
+bash ./autotest_local.sh random
+```
