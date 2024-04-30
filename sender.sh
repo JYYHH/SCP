@@ -1,4 +1,5 @@
 make
+rm log/*
 
 cp data/$1 .
 mv $1 test_data_1
